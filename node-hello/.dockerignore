@@ -1,0 +1,4 @@
+# Add files/folders which are not required in docker container
+**/node_modules
+**/tests
+**/tests/**

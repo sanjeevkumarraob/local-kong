@@ -1,0 +1,71 @@
+version: "3.9" 
+services:
+  kong-database:
+    container_name: kong-database
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: kongpass
+      POSTGRES_USER: kong
+      POSTGRES_DB: kong
+    ports:
+      - 5432:5432
+  kong-bootstrap:
+    image: kong/kong-gateway:2.8.1.1-alpine
+    depends_on:
+      - "kong-database"
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: kongpass
+      KONG_PASSWORD: admin
+    entrypoint:  ["kong", "migrations", "bootstrap"]
+  kong:
+    image: kong/kong-gateway:2.8.1.1-alpine
+    restart: always
+    depends_on:
+      - "kong-database"
+      - kong-bootstrap
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_PASSWORD: kongpass
+      KONG_PG_USER: kong
+      KONG_PASSWORD: admin
+      KONG_PROXY_ACCESS_LOG: "/dev/stdout"
+      KONG_ADMIN_ACCESS_LOG: "/dev/stdout"
+      KONG_PROXY_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_ERROR_LOG: "/dev/stderr"
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+      KONG_ADMIN_GUI_URL: "http://localhost:8002"
+      KONG_PORTAL_GUI_HOST: "localhost:8003"
+      KONG_PORTAL: "on"
+    healthcheck:
+      test: ["CMD", "kong", "health"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    ports:
+      - "8000:8000"
+      - "8443:8443"
+      - "8001:8001"
+      - "8444:8444"
+      - "8002:8002"
+      - "8445:8445"
+      - "8003:8003"
+      - "8004:8004"
+    volumes:
+      - ./:/kong/declarative
+      - ./license.json:/etc/kong/license.json
+  node-hello:
+    build: ./node-hello
+    depends_on:
+      - kong
+    ports:
+      - 3000:3000    
+
+networks:
+  default:
+    # Use a custom driver
+    name: kong-net

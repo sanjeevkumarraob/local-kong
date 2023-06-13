@@ -1,0 +1,20 @@
+{
+  "name": "learn-playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js e2e/features/**/*.feature --require ./playwright.config.js --require e2e/step-definitions/**/*.js --format @cucumber/pretty-formatter --format html:playwright-report/report.html "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@cucumber/cucumber": "^7.3.1",
+    "@cucumber/pretty-formatter": "^1.0.0",
+    "@playwright/test": "^1.25.1"
+  },
+  "dependencies": {
+    "playwright": "^1.25.1"
+  }
+}

@@ -1,0 +1,42 @@
+_format_version: "1.1"
+services:
+  - name: Node_Hello_API
+    protocol: http
+    host: node-hello
+    port: 3000
+    path: /
+    plugins: []
+    routes:
+      - tags:
+          &a1
+          - OAS3_import
+          - OAS3file_oas.yaml
+        name: Node_Hello_API-postsget
+        methods:
+          - GET
+        paths:
+          - /posts/(?<postId>[^\/]+)$
+        strip_path: false
+      - tags: *a1
+        name: Node_Hello_API-postslist
+        methods:
+          - GET
+        paths:
+          - /posts$
+        strip_path: false
+        plugins:
+          - enabled: true
+            config:
+              minute: 3
+            name: rate-limiting
+            tags:
+              - OAS3_import
+              - OAS3file_oas.yaml
+      - tags: *a1
+        name: Node_Hello_API-postscreate
+        methods:
+          - POST
+        paths:
+          - /posts$
+        strip_path: false
+    tags: *a1

@@ -1,0 +1,38 @@
+_format_version: "2.1"
+services:
+- host: mockbin.org
+  name: mockbin_service
+  port: 80
+  protocol: http
+  routes:
+  - name: mocking
+    paths:
+    - /mock
+    strip_path: true
+- host: node-hello
+  name: json-server
+  port: 3000
+  protocol: http
+  plugins:
+  - name: rate-limiting
+    config:
+      minute: 50
+      policy: local
+  routes:
+  - name: posts
+    paths:
+    - /posts
+    strip_path: false    
+  - name: profile
+    paths:
+    - /profile
+    strip_path: false    
+  - name: comments
+    paths:
+    - /comments
+    strip_path: false    
+plugins:
+- name: rate-limiting
+  config:
+    minute: 5
+    policy: local
